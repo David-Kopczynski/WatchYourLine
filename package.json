@@ -2,25 +2,29 @@
   "name": "watch-your-line",
   "displayName": "WatchYourLine",
   "description": "Track your today's written lines",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "publisher": "David E. C. Kopczynski",
+  "license": "MIT",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#1f1f1f",
+    "theme": "dark"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
   "categories": [
+    "Programming Languages",
+    "Notebooks",
+    "Education",
+    "Testing",
     "Other"
   ],
   "activationEvents": [
-    "onCommand:watch-your-line.helloWorld"
+    "*"
   ],
   "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "watch-your-line.helloWorld",
-        "title": "Hello World"
-      }
-    ]
-  },
+  "contributes": {},
   "scripts": {
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",

@@ -3,7 +3,11 @@
   "displayName": "WatchYourLine",
   "description": "Track your today's written lines",
   "version": "1.0.0",
-  "publisher": "David E. C. Kopczynski",
+  "publisher": "DavidEliasChrisKopczynski",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/David-Kopczynski/WatchYourLine"
+  },
   "license": "MIT",
   "icon": "icon.png",
   "galleryBanner": {

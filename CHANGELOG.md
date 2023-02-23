@@ -9,3 +9,7 @@ All notable changes to the "watch-your-line" extension will be documented in thi
 ## [1.0.1]
 
 - Fixed desync issue when using multiple workspaces
+
+## [1.1.0]
+
+- Added messages to gratulate the user for reaching a milestone

@@ -1,28 +1,33 @@
 import * as vscode from "vscode";
 
 export default class Tracker {
-  protected observer: ((count: number) => void)[] = [];
-  protected today: Date | undefined;
+  protected readonly count = "count";
+  protected readonly lastUpdated = "lastUpdated";
 
+  protected observer: ((count: number) => void)[] = [];
+  protected readonly observerUpdate = this.count;
+
+  private _today: Date | undefined;
   private _currentCount: number | undefined;
 
   constructor(private context: vscode.ExtensionContext) {
     this.syncTime();
     this.track();
+    this.initObserver();
   }
 
   /**
    * Track the number of lines written today
    */
   public track() {
-    const tracker = vscode.workspace.onDidChangeTextDocument((event) => {
-      const newLines = event.contentChanges.filter((change) =>
-        change.text.includes("\n")
-      ).length;
-      this.updateState(newLines);
-    });
-
-    this.context.subscriptions.push(tracker);
+    this.context.subscriptions.push(
+      vscode.workspace.onDidChangeTextDocument((event) => {
+        const newLines = event.contentChanges.filter((change) =>
+          change.text.includes("\n")
+        ).length;
+        this.updateState(newLines);
+      })
+    );
   }
 
   /**
@@ -31,60 +36,80 @@ export default class Tracker {
    */
   public observe(callback: (count: number) => void) {
     this.observer.push(callback);
-    this.observer.forEach((callback) => callback(this.getState()));
+    if (this._currentCount !== undefined) callback(this._currentCount);
+  }
+
+  /**
+   * Observe the number of lines written today and update the state
+   */
+  protected async initObserver() {
+    // Load initial state
+    this._currentCount = this.context.globalState.get(this.count);
+    this.observer.forEach((callback) => callback(this._currentCount || 0));
+
+    // Observer to update the state
+    this.context.subscriptions.push(
+      this.context.secrets.onDidChange(async (event) => {
+        if (event.key === this.observerUpdate) {
+          this._currentCount = parseInt(
+            (await this.context.secrets.get(this.observerUpdate)) || "0"
+          );
+
+          this.observer.forEach((callback) =>
+            callback(this._currentCount || 0)
+          );
+        }
+      })
+    );
+  }
+
+  /**
+   * Trigger global state observer
+   */
+  protected async triggerObserver() {
+    this.context.secrets.store(this.observerUpdate, `${this._currentCount}`);
   }
 
   /**
    * Update the state of the extension
    * @param count Number of lines written today
    */
-  private updateState(count: number) {
-    // Check if new day and reset count
-    this.syncTime();
+  protected async updateState(count: number) {
+    // Prevent count loss on extension load
+    if (this._currentCount !== undefined) {
+      // Check if new day and reset count
+      await this.syncTime();
 
-    // Update the state
-    const newCount = this.getState() + count;
-    this.context.globalState.update("count", newCount);
-    this._currentCount = newCount;
+      // Update the state
+      const newCount = this._currentCount + count;
+      await this.context.globalState.update(this.count, newCount);
+      this._currentCount = newCount;
 
-    this.observer.forEach((callback) => callback(newCount));
-  }
-
-  /**
-   * Get the number of lines written today
-   * @returns Number of lines written today
-   */
-  private getState(): number {
-    // Cache the current count to avoid unnecessary calls to the global state
-    if (this._currentCount === undefined) {
-      this._currentCount =
-        (this.context.globalState.get("count") as number | undefined) || 0;
+      // Trigger observer
+      await this.triggerObserver();
     }
-
-    return this._currentCount;
   }
 
   /**
    * Check if state is from another day and reset
    */
-  private syncTime() {
-    if (this.today?.getDate() !== new Date().getDate()) {
+  protected async syncTime() {
+    if (this._today?.getDate() !== new Date().getDate()) {
       // Check if state is from another day and reset
-      this.today = new Date();
-      const lastUpdated = this.context.globalState.get("lastUpdated") as
+      this._today = new Date();
+      const lastUpdated = this.context.globalState.get(this.lastUpdated) as
         | string
         | undefined;
 
       if (
         !lastUpdated ||
-        this.today.getDate() !== new Date(lastUpdated)?.getDate()
+        this._today.getDate() !== new Date(lastUpdated)?.getDate()
       ) {
-        this.context.globalState.update("count", 0);
-        this.context.globalState.update(
-          "lastUpdated",
-          this.today.toISOString()
+        await this.context.globalState.update(this.count, 0);
+        await this.context.globalState.update(
+          this.lastUpdated,
+          this._today.toISOString()
         );
-
         this._currentCount = 0;
       }
     }

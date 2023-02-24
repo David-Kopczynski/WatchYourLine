@@ -13,3 +13,8 @@ All notable changes to the "watch-your-line" extension will be documented in thi
 ## [1.1.0]
 
 - Added messages to gratulate the user for reaching a milestone
+
+## [1.1.1]
+
+- Added setting to disable milestone messages
+- Slightly modified milestone targets (new maximum at 2000 lines)

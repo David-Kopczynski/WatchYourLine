@@ -2,7 +2,7 @@
   "name": "watch-your-line",
   "displayName": "WatchYourLine",
   "description": "Track your today's written lines",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "DavidEliasChrisKopczynski",
   "repository": {
     "type": "git",
@@ -28,7 +28,18 @@
     "*"
   ],
   "main": "./out/extension.js",
-  "contributes": {},
+  "contributes": {
+    "configuration": {
+      "title": "WatchYourLine",
+      "properties": {
+        "watch-your-line.milestones.show": {
+          "type": "boolean",
+          "default": true,
+          "description": "Open message dialogs to congratulate you when you reach milestones."
+        }
+      }
+    }
+  },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",

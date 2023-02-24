@@ -18,3 +18,8 @@ All notable changes to the "watch-your-line" extension will be documented in thi
 
 - Added setting to disable milestone messages
 - Slightly modified milestone targets (new maximum at 2000 lines)
+
+## [1.1.2]
+
+- Fixed terminal output being tracked as lines written
+- Fixed wrong line count when pasting multiple lines

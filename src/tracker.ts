@@ -22,9 +22,13 @@ export default class Tracker {
   public track() {
     this.context.subscriptions.push(
       vscode.workspace.onDidChangeTextDocument((event) => {
-        const newLines = event.contentChanges.filter((change) =>
-          change.text.includes("\n")
-        ).length;
+        // Only track files by the user
+        if (event.document.uri.scheme !== "file") return;
+
+        const newLines = event.contentChanges.reduce(
+          (sum, change) => sum + change.text.split("\n").length - 1,
+          0
+        );
         this.updateState(newLines);
       })
     );

@@ -8,7 +8,7 @@
     "type": "git",
     "url": "https://github.com/David-Kopczynski/WatchYourLine"
   },
-  "license": "MIT",
+  "license": "mit",
   "icon": "icon.png",
   "galleryBanner": {
     "color": "#1f1f1f",
@@ -46,7 +46,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package --allow-star-activation"
   },
   "devDependencies": {
     "@types/vscode": "^1.75.0",

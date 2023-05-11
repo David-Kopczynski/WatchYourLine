@@ -11,9 +11,12 @@ export default class Tracker {
   private _currentCount: number | undefined;
 
   constructor(private context: vscode.ExtensionContext) {
-    this.syncTime();
-    this.track();
-    this.initObserver();
+    (async () => {
+      await this.syncTime();
+      await this.initObserver();
+
+      this.track();
+    })();
   }
 
   /**
@@ -25,11 +28,15 @@ export default class Tracker {
         // Only track files by the user
         if (event.document.uri.scheme !== "file") return;
 
+        // And if not an undo or redo operation
+        if (event.reason) return;
+
         const newLines = event.contentChanges.reduce(
-          (sum, change) => sum + change.text.split("\n").length - 1,
+          (sum, change) => sum + (change.text.match(/\n/g) || []).length,
           0
         );
-        this.updateState(newLines);
+
+        if (newLines) this.updateState(newLines);
       })
     );
   }
@@ -49,7 +56,7 @@ export default class Tracker {
   protected async initObserver() {
     // Load initial state
     this._currentCount = this.context.globalState.get(this.count);
-    this.observer.forEach((callback) => callback(this._currentCount || 0));
+    this.observer.forEach((callback) => callback(this._currentCount as number));
 
     // Observer to update the state
     this.context.subscriptions.push(
@@ -60,7 +67,7 @@ export default class Tracker {
           );
 
           this.observer.forEach((callback) =>
-            callback(this._currentCount || 0)
+            callback(this._currentCount as number)
           );
         }
       })

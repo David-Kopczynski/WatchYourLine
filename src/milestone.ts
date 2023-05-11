@@ -2,9 +2,9 @@ import * as vscode from "vscode";
 
 export default class Milestone {
   protected readonly magicNumbers = [
-    69, 100, 187, 420, 1000, 1337, 2000,
+    0, 69, 100, 187, 420, 1000, 1337, 2000,
   ] as const;
-  private _lastMilestone: typeof this.magicNumbers[number] | 0 | undefined;
+  private _lastMilestone: (typeof this.magicNumbers)[number] | undefined;
 
   constructor(private context: vscode.ExtensionContext) {}
 
@@ -22,6 +22,10 @@ export default class Milestone {
 
     if (newMilestone !== this._lastMilestone) {
       switch (newMilestone) {
+        case 0:
+          // Prevent showing a message when the user has written 0 lines
+          break;
+
         case 69:
           this.show("Nice. 😏");
           break;
@@ -58,11 +62,11 @@ export default class Milestone {
    * @param count Number of lines written today
    * @returns Milestone number
    */
-  private milestoneByCount(count: number): typeof this.magicNumbers[number] {
+  private milestoneByCount(count: number): (typeof this.magicNumbers)[number] {
     return Math.max(
       ...this.magicNumbers.filter((number) => number <= count),
       0
-    ) as typeof this.magicNumbers[number];
+    ) as (typeof this.magicNumbers)[number];
   }
 
   /**

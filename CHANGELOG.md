@@ -23,3 +23,8 @@ All notable changes to the "watch-your-line" extension will be documented in thi
 
 - Fixed terminal output being tracked as lines written
 - Fixed wrong line count when pasting multiple lines
+
+## [1.1.3]
+
+- Fixed milestone messages showing up when no milestone was reached
+- Improved overall stability
